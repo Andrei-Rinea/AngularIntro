@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html ng-app="main">
+<head>
+    <title>AngularJS Intro</title>
+    <meta charset="utf-8" />
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <script src="Scripts/angular.js"></script>
+</head>
+<body ng-controller="mainController">
+    <h1>AngularJS Intro</h1>
+
+    <div>
+        <input type="text" ng-model="test" />
+        <div>Hello, {{test}}!</div>
+    </div>
+
+    <script type="text/javascript">
+        var app = angular.module('main', []);
+        app.controller('mainController', function () {
+
+        });
+    </script>
+</body>
+</html>
