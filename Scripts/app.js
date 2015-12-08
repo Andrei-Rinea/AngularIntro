@@ -47,6 +47,7 @@ app.controller('mainController', function ($http, $scope) {
         var contact = getContactById(id);
         if (contact == null)
             return;
+
         var consent = confirm('Are you sure you want to delete "' + contact.Name + '"?');
         if (!consent)
             return;
@@ -59,7 +60,7 @@ app.controller('mainController', function ($http, $scope) {
         });
     };
 
-    $scope.order = function(predicate) {
+    $scope.order = function (predicate) {
         if ($scope.sortPredicate === predicate) {
             $scope.sortReversed = !$scope.sortReversed;
         } else {
@@ -67,4 +68,47 @@ app.controller('mainController', function ($http, $scope) {
             $scope.sortReversed = false;
         }
     };
+
+    $scope.edit = function (id) {
+        var contact = getContactById(id);
+        if (contact == null)
+            return;
+
+        contact.NewName = contact.Name;
+        contact.NewEmail = contact.Email;
+        contact.Editing = true;
+    }
+
+    $scope.undoEdit = function (id) {
+        var contact = getContactById(id);
+        if (contact == null)
+            return;
+
+        contact.Editing = false;
+    }
+
+    $scope.applyEdit = function (id) {
+        var contact = getContactById(id);
+        if (contact == null)
+            return;
+
+        if (!contact.NewName || !contact.NewEmail) {
+            alert('please enter a name and an email');
+            return;
+        }
+
+        var dto = {
+            Id: contact.Id,
+            Name: contact.NewName,
+            Email: contact.NewEmail
+        };
+
+        $http.post('/api/contacts', dto).then(function () {
+            contact.Name = contact.NewName;
+            contact.Email = contact.NewEmail;
+            contact.Editing = false;
+        }, function () {
+            alert('could not save changes :(');
+        });
+    }
 });

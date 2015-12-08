@@ -46,12 +46,22 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="contact in contacts | orderBy: sortPredicate:sortReversed | filter: filterText as results">
+        <tr ng-repeat="contact in contacts | orderBy: sortPredicate:sortReversed | filter: filterText as results"
+            ng-dblclick="edit(contact.Id)">
                 <td>{{$index + 1}}</td>
-                <td>{{contact.Name}}</td>
-                <td>{{contact.Email}}</td>
                 <td>
-                    <a ng-click="delete(contact.Id)">Delete</a>
+                    <span ng-hide="contact.Editing">{{contact.Name}}</span>
+                    <input type="text" ng-model="contact.NewName" ng-show="contact.Editing"/>
+                </td>
+                <td>
+                    <span ng-hide="contact.Editing">{{contact.Email}}</span>
+                    <input type="email" ng-model="contact.NewEmail" ng-show="contact.Editing" />
+                </td>
+                <td>
+                    <a ng-click="delete(contact.Id)" ng-hide="contact.Editing">Delete</a>
+                    <a ng-click="edit(contact.Id)" ng-hide="contact.Editing">Edit</a>
+                    <a ng-click="applyEdit(contact.Id)" ng-show="contact.Editing">Apply</a>
+                    <a ng-click="undoEdit(contact.Id)" ng-show="contact.Editing">Undo</a>
                 </td>
             </tr>
             <tr ng-if="results.length == 0">
