@@ -28,13 +28,17 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Name</th>
-                <th>Email</th>
+                <th>
+                    <a ng-click="order('Name')"> Name</a>
+                </th>
+                <th>
+                    <a ng-click="order('Email')">Email</a>
+                </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="contact in contacts | filter: filterText as results">
+            <tr ng-repeat="contact in contacts | orderBy: sortPredicate:sortReversed | filter: filterText as results">
                 <td>{{$index + 1}}</td>
                 <td>{{contact.Name}}</td>
                 <td>{{contact.Email}}</td>

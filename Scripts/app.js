@@ -1,5 +1,8 @@
 ﻿var app = angular.module('main', []);
 app.controller('mainController', function ($http, $scope) {
+    $scope.sortPredicate = "Id";
+    $scope.sortReversed = true;
+
     $scope.loading = true;
     $http.get('/api/contacts').then(function (response) {
         $scope.contacts = response.data;
@@ -54,5 +57,14 @@ app.controller('mainController', function ($http, $scope) {
         }, function () {
             alert('could not delete contact :(');
         });
+    };
+
+    $scope.order = function(predicate) {
+        if ($scope.sortPredicate === predicate) {
+            $scope.sortReversed = !$scope.sortReversed;
+        } else {
+            $scope.sortPredicate = predicate;
+            $scope.sortReversed = false;
+        }
     };
 });
