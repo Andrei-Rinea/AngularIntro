@@ -12,6 +12,15 @@
         <p>just scratching the surface :)</p>
     </div>
 
+
+    <section>
+        <h3>Add new contact</h3>
+        <input type="text" placeholder="name" ng-model="newName" />
+        <input type="email" placeholder="email" ng-model="newEmail" />
+        <button ng-click="createNewContact()">Create</button>
+    </section>
+
+
     <h3>Contacts</h3>
     <table class="table table-striped" ng-hide="loading">
         <thead>
@@ -43,6 +52,27 @@
                 alert('could not get contacts :(');
                 $scope.loading = false;
             });
+
+            $scope.newName = null;
+            $scope.newEmail = null;
+            $scope.createNewContact = function () {
+                if (!$scope.newName || !$scope.newEmail) {
+                    alert('Please enter a name and an email.');
+                    return;
+                }
+                var newContact = {
+                    Name: $scope.newName,
+                    Email: $scope.newEmail
+                };
+                $http.put('/api/contacts', newContact).then(function (response) {
+                    newContact.Id = response.data;
+                    $scope.contacts.push(newContact);
+                    $scope.newName = null;
+                    $scope.newEmail = null;
+                }, function (error) {
+                    alert('could not create contact :(');
+                });
+            };
         });
     </script>
 </body>
