@@ -24,17 +24,17 @@
         Filter contacts:
         <input type="text" ng-model="filterText" />
     </p>
-    <table class="table table-striped" ng-hide="loading">
+    <table class="table table-striped" ng-hide="loading || contacts.length == 0">
         <thead>
-        <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th></th>
-        </tr>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th></th>
+            </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="contact in contacts | filter: filterText">
+            <tr ng-repeat="contact in contacts | filter: filterText as results">
                 <td>{{$index + 1}}</td>
                 <td>{{contact.Name}}</td>
                 <td>{{contact.Email}}</td>
@@ -42,11 +42,21 @@
                     <a ng-click="delete(contact.Id)">Delete</a>
                 </td>
             </tr>
+            <tr ng-if="results.length == 0">
+                <td colspan="4">
+                    no results match
+                </td>
+            </tr>
         </tbody>
     </table>
 
     <div ng-show="loading" class="alert alert-warning">
         <span class="alert">loading, please wait :)</span>
+    </div>
+
+
+    <div ng-show="!loading && contacts.length == 0" class="alert alert-info">
+        <span class="alert">No contacts defined yet</span>
     </div>
 
     <script src="Scripts/app.js"></script>
