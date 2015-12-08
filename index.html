@@ -11,15 +11,31 @@
         <h1>AngularJS Intro</h1>
         <p>just scratching the surface :)</p>
     </div>
-    <div>
-        <input type="text" ng-model="test" />
-        <div>Hello, {{test}}!</div>
-    </div>
+
+    <h3>Contacts</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="contact in contacts">
+                <td>{{contact.Name}}</td>
+                <td>{{contact.Email}}</td>
+            </tr>
+        </tbody>
+    </table>
 
     <script type="text/javascript">
         var app = angular.module('main', []);
-        app.controller('mainController', function () {
-
+        app.controller('mainController', function ($http, $scope) {
+            $http.get('/api/contacts').then(function (response) {
+                $scope.contacts = response.data;
+            }, function (error) {
+                alert('could not get contacts :(');
+            });
         });
     </script>
 </body>
