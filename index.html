@@ -12,7 +12,6 @@
         <p>just scratching the surface :)</p>
     </div>
 
-
     <section>
         <h3>Add new contact</h3>
         <input type="text" placeholder="name" ng-model="newName" />
@@ -20,8 +19,11 @@
         <button ng-click="createNewContact()">Create</button>
     </section>
 
-
     <h3>Contacts</h3>
+    <p>
+        Filter contacts:
+        <input type="text" ng-model="filterText" />
+    </p>
     <table class="table table-striped" ng-hide="loading">
         <thead>
             <tr>
@@ -30,7 +32,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="contact in contacts">
+            <tr ng-repeat="contact in contacts | filter: filterText">
                 <td>{{contact.Name}}</td>
                 <td>{{contact.Email}}</td>
             </tr>
@@ -41,39 +43,6 @@
         <span class="alert">loading, please wait :)</span>
     </div>
 
-    <script type="text/javascript">
-        var app = angular.module('main', []);
-        app.controller('mainController', function ($http, $scope) {
-            $scope.loading = true;
-            $http.get('/api/contacts').then(function (response) {
-                $scope.contacts = response.data;
-                $scope.loading = false;
-            }, function (error) {
-                alert('could not get contacts :(');
-                $scope.loading = false;
-            });
-
-            $scope.newName = null;
-            $scope.newEmail = null;
-            $scope.createNewContact = function () {
-                if (!$scope.newName || !$scope.newEmail) {
-                    alert('Please enter a name and an email.');
-                    return;
-                }
-                var newContact = {
-                    Name: $scope.newName,
-                    Email: $scope.newEmail
-                };
-                $http.put('/api/contacts', newContact).then(function (response) {
-                    newContact.Id = response.data;
-                    $scope.contacts.push(newContact);
-                    $scope.newName = null;
-                    $scope.newEmail = null;
-                }, function (error) {
-                    alert('could not create contact :(');
-                });
-            };
-        });
-    </script>
+    <script src="Scripts/app.js"></script>
 </body>
 </html>
