@@ -6,9 +6,11 @@
     <link href="Content/bootstrap.css" rel="stylesheet" />
     <script src="Scripts/angular.js"></script>
 </head>
-<body ng-controller="mainController">
-    <h1>AngularJS Intro</h1>
-
+<body ng-controller="mainController" class="container-fluid">
+    <div class="jumbotron">
+        <h1>AngularJS Intro</h1>
+        <p>just scratching the surface :)</p>
+    </div>
     <div>
         <input type="text" ng-model="test" />
         <div>Hello, {{test}}!</div>
