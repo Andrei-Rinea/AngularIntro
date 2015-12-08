@@ -30,9 +30,17 @@
                 <th>#</th>
                 <th>
                     <a ng-click="order('Name')"> Name</a>
+                    <span ng-show="sortPredicate == 'Name'">
+                        <span ng-show="sortReversed">v</span>
+                        <span ng-hide="sortReversed">^</span>
+                    </span>
                 </th>
                 <th>
                     <a ng-click="order('Email')">Email</a>
+                    <span ng-show="sortPredicate == 'Email'">
+                        <span ng-show="sortReversed">v</span>
+                        <span ng-hide="sortReversed">^</span>
+                    </span>
                 </th>
                 <th></th>
             </tr>
