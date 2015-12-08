@@ -26,15 +26,21 @@
     </p>
     <table class="table table-striped" ng-hide="loading">
         <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-            </tr>
+        <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
         </thead>
         <tbody>
             <tr ng-repeat="contact in contacts | filter: filterText">
+                <td>{{$index + 1}}</td>
                 <td>{{contact.Name}}</td>
                 <td>{{contact.Email}}</td>
+                <td>
+                    <a ng-click="delete(contact.Id)">Delete</a>
+                </td>
             </tr>
         </tbody>
     </table>

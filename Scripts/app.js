@@ -29,4 +29,30 @@ app.controller('mainController', function ($http, $scope) {
             alert('could not create contact :(');
         });
     };
+
+    function getContactById(id) {
+        var contacts = $scope.contacts;
+        for (var i = 0; i < contacts.length; i++) {
+            var contact = contacts[i];
+            if (contact.Id === id)
+                return contact;
+        }
+        return null;
+    }
+
+    $scope.delete = function (id) {
+        var contact = getContactById(id);
+        if (contact == null)
+            return;
+        var consent = confirm('Are you sure you want to delete "' + contact.Name + '"?');
+        if (!consent)
+            return;
+
+        $http.delete('/api/contacts/' + id).then(function () {
+            var index = $scope.contacts.indexOf(contact);
+            $scope.contacts.splice(index, 1);
+        }, function () {
+            alert('could not delete contact :(');
+        });
+    };
 });
