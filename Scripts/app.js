@@ -1,144 +1,114 @@
-﻿var app = angular.module("main", []);
+﻿var app = angular.module('main', []);
+app.controller('mainController', function ($http, $scope) {
+    $scope.sortPredicate = "Id";
+    $scope.sortReversed = true;
 
-app.controller("mainController", function ($scope, $http) {
+    $scope.loading = true;
+    $http.get('/api/contacts').then(function (response) {
+        $scope.contacts = response.data;
+        $scope.loading = false;
+    }, function (error) {
+        alert('could not get contacts :(');
+        $scope.loading = false;
+    });
 
-    var apiUrl = "/api/contacts";
-
-    function findContactById(id) {
-        var result = {
-            contact: null,
-            index: null
+    $scope.newName = null;
+    $scope.newEmail = null;
+    $scope.createNewContact = function () {
+        if (!$scope.newName || !$scope.newEmail) {
+            alert('Please enter a name and an email.');
+            return;
+        }
+        var newContact = {
+            Name: $scope.newName,
+            Email: $scope.newEmail
         };
+        $http.put('/api/contacts', newContact).then(function (response) {
+            newContact.Id = response.data;
+            $scope.contacts.push(newContact);
+            $scope.newName = null;
+            $scope.newEmail = null;
+        }, function (error) {
+            alert('could not create contact :(');
+        });
+    };
 
-        for (var i = 0; i < $scope.contacts.length; i++) {
-            if ($scope.contacts[i].Id === id) {
-                result.contact = $scope.contacts[i];
-                result.index = i;
-                return result;
-            }
+    function getContactById(id) {
+        var contacts = $scope.contacts;
+        for (var i = 0; i < contacts.length; i++) {
+            var contact = contacts[i];
+            if (contact.Id === id)
+                return contact;
         }
         return null;
     }
 
-    // the column to sort by
-    $scope.orderPredicate = "Id";
-
-    // the sort direction
-    $scope.orderReverse = false;
-
-    $scope.order = function (predicate) {
-        if ($scope.orderPredicate === predicate) {
-            $scope.orderReverse = !$scope.orderReverse;
-        } else {
-            $scope.orderPredicate = predicate;
-            $scope.orderReverse = false;
-        }
-    }
-
-    // reload button
-    $scope.reload = function () {
-        $scope.loading = true;
-        $scope.working = false;
-
-        $http.get(apiUrl).then(function (successResponse) {
-            $scope.contacts = successResponse.data;
-            $scope.loading = false;
-        }, function (errorResponse) {
-            $scope.loading = false;
-            alert("error loading data :( code: " + errorResponse.status);
-        });
-    }
-
-    $scope.newValid = function () {
-        return $scope.newEmail != null && $scope.newName != null;
-    }
-
-    // create new contact button
-    $scope.onCreate = function () {
-        var contact = {
-            Name: $scope.newName,
-            Email: $scope.newEmail
-        };
-
-        $scope.working = true;
-        $http.put(apiUrl, contact).then(function (successResponse) {
-            contact.Id = successResponse.data;
-            $scope.contacts.push(contact);
-            $scope.newName = null;
-            $scope.newEmail = null;
-            $scope.working = false;
-        }, function (errorResponse) {
-            $scope.working = false;
-            alert("could not create contact :( code: " + errorResponse.status);
-        });
-    }
-
-    // delete button - on the row
     $scope.delete = function (id) {
-        var result = findContactById(id);
-        if (!result)
+        var contact = getContactById(id);
+        if (contact == null)
             return;
-        var consent = confirm("Are you sure you want to delete '" + result.contact.Name + "' (id: " + result.contact.Id + ") ?");
+
+        var consent = confirm('Are you sure you want to delete "' + contact.Name + '"?');
         if (!consent)
             return;
 
-        $scope.working = true;
-        $http.delete(apiUrl + "/" + result.contact.Id).then(function () {
-            $scope.contacts.splice(result.index, 1);
-            $scope.working = false;
-        }, function (errorResponse) {
-            $scope.working = false;
-            alert("could not delete contact :( code: " + errorResponse.status);
+        $http.delete('/api/contacts/' + id).then(function () {
+            var index = $scope.contacts.indexOf(contact);
+            $scope.contacts.splice(index, 1);
+        }, function () {
+            alert('could not delete contact :(');
         });
-    }
+    };
 
-    // edit button - on the row - enters edit mode
+    $scope.order = function (predicate) {
+        if ($scope.sortPredicate === predicate) {
+            $scope.sortReversed = !$scope.sortReversed;
+        } else {
+            $scope.sortPredicate = predicate;
+            $scope.sortReversed = false;
+        }
+    };
+
     $scope.edit = function (id) {
-        var result = findContactById(id);
-        if (!result)
+        var contact = getContactById(id);
+        if (contact == null)
             return;
-        var contact = result.contact;
-        contact.editing = true;
-        contact.newName = contact.Name;
-        contact.newEmail = contact.Email;
+
+        contact.NewName = contact.Name;
+        contact.NewEmail = contact.Email;
+        contact.Editing = true;
     }
 
-    // undo edit button - on the row - while in edit mode
     $scope.undoEdit = function (id) {
-        var result = findContactById(id);
-        if (!result)
+        var contact = getContactById(id);
+        if (contact == null)
             return;
-        var contact = result.contact;
-        contact.editing = false;
-        delete contact.newName;
-        delete contact.newEmail;
+
+        contact.Editing = false;
     }
 
-    // save button - on the row - while in edit mode
     $scope.applyEdit = function (id) {
-        var result = findContactById(id);
-        if (!result)
+        var contact = getContactById(id);
+        if (contact == null)
             return;
-        var contact = result.contact;
+
+        if (!contact.NewName || !contact.NewEmail) {
+            alert('please enter a name and an email');
+            return;
+        }
 
         var dto = {
             Id: contact.Id,
-            Name: contact.newName,
-            Email: contact.newEmail
+            Name: contact.NewName,
+            Email: contact.NewEmail
         };
 
-        $scope.working = true;
-        $http.post(apiUrl, dto).then(function () {
-            contact.editing = false;
-            contact.Name = contact.newName;
-            contact.Email = contact.newEmail;
-            $scope.working = false;
-        }, function (errorResponse) {
-            $scope.working = false;
-            alert("could not apply edit to contact :( code: " + errorResponse.status);
+        $http.post('/api/contacts', dto).then(function () {
+            contact.Name = contact.NewName;
+            contact.Email = contact.NewEmail;
+            contact.Editing = false;
+        }, function () {
+            alert('could not save changes :(');
         });
     }
-
-    // loads data at startup
-    $scope.reload();
 });
